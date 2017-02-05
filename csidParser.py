@@ -70,6 +70,6 @@ fwData = csidParse(csidList)
 print(fwData)
 
 # build and write to target csv
-with open(timeStamp('own-ssid-upload.csv'), 'w', newline='') as csvfile:
+with open(timeStamp('ssid-upload.csv'), 'w', newline='') as csvfile:
   writer = csv.writer(csvfile)
   writer.writerows(fwData)
