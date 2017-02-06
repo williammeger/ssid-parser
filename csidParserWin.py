@@ -1,15 +1,9 @@
-#Windows File
 import csv
 import datetime
 
-csid = "oprah.com/"
-domain = csid.rsplit('/')[0]
-siteSection = "SS|OWN"
-siteGroup = "SG|OWN"
-delimiters = {
-  '/': '|',
-  '-': ' '
-}
+siteSection = "SS|"
+siteGroup = "SG|"
+delimiters = { '/':'|', '-':' '}
 colNames = ['Parent Item', 'Item Type', 'Item Name', 'Item Tag']
 
 def toSiteGroup(text):
@@ -29,6 +23,12 @@ def timeStamp(fname, fmt='%Y-%m-%d_{fname}'):
   Site, SiteSection, SiteGroup, csid
 '''
 
+def swapDomain(domainName):
+  for key, value in networks.items():
+    if domainName in networks:
+      domainName = domainName.replace(key, value)
+  return domainName
+
 def csidParse(source):
   # create target for source list
   target = []
@@ -36,36 +36,41 @@ def csidParse(source):
   subTargetSiteGroup = []
   for csid in source:
     csidOrigin = csid
-    csid = csid.replace(domain, '')
+    # get csid value based on each item in list
+    # remove domain name
+    domain = csid.rsplit('/')[0]
+    # generate network acronym based on domain in csid
+    networkAbv = swapDomain(domain)
+    domainOrigin = domain
+    csid = csid.replace(domainOrigin, '')
     for key in delimiters:
       csid = csid.replace(key, delimiters[key]).lower()
-    ss = siteSection + csid.title()
+    ss = siteSection + networkAbv + csid.title()
     csidAsString = str(csid)
-    sg = siteGroup + toSiteGroup(csidAsString).title()
-    target.extend((domain, sg, ss, csidOrigin))
+    sg = siteGroup + networkAbv + toSiteGroup(csidAsString).title()
+    target.extend((domainOrigin, sg, ss, csidOrigin))
   # breaks up target list into smaller lists for each csid
   # includes domain, SS, and csid
   subTargetDomain = [target[i:i + 4] for i in range(0, len(target), 4)]
-  # includes SG, SS, and csid
-  # subTargetSiteGroup = [target[i:i + 4] for i in range(0, len(target), 4) if i != 0]
   subTargetDomain.insert(0, colNames)
   return subTargetDomain
 
+# start 
 
-''' 
-START
-'''
+with open('networks.csv') as f:
+  networks = dict(filter(None, csv.reader(f)))
+
 # read in file contents to a source list
-# windows requires a raw string to parse
-with open(r"C:\Users\wmeger\Desktop\testUrls.txt") as f:
+# windows requires raw string path 
+with open(r"C:\Users\testUrls.txt") as f:
   csidList = f.readlines()
-#remove whitespace characters like `\n` at EOL
+#remove whitespace characters like `\n` at end of line
 csidList = [x.strip() for x in csidList]
 
 fwData = csidParse(csidList)
 print(fwData)
 
 # build and write to target csv
-with open(timeStamp('own-ssid-upload.csv'), 'w', newline='') as csvfile:
+with open(timeStamp('ssid-upload.csv'), 'w', newline='') as csvfile:
   writer = csv.writer(csvfile)
   writer.writerows(fwData)
