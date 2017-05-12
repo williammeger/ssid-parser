@@ -8,7 +8,7 @@ names = {'AHC':'AHC',
         'DLF':'Discovery Life',
         'IDS':'Investigation Discovery',
         'SCI':'Science',
-        'TlC':'TLC',
+        'TLC':'TLC',
         'VEL':'Velocity'}
 
 print('========' + '\n'
@@ -16,15 +16,23 @@ print('========' + '\n'
       '========' + '\n')
       
 for k, v in names.items():
-    print(k)
+    print(k + '- ' + v)
 
 network = input('\n'+ 'Choose a network to export' + '\n' +
-                'or type "All" for complete export')
+                'or type "ALL" for complete export' + '\n').upper()
 
-data = pd.read_csv('shows.csv', usecols=[4,6])
-if network == 'ALL':
-    network_df = data
-else:
-    network_df = data.loc[data['network_code'] == network]
-filename = 'network_db_extract.csv'
+# TODO
+# add functionality for user to choose source
+# file to begin extraction
+
+all_df = pd.read_csv('shows.csv', usecols=[4,6])
+
+# assume we want to export everything
+network_df = all_df
+
+if network in names:
+    # export csv with network and csids
+    network_df = all_df.loc[all_df['network_code'] == network]
+
+filename = 'db_extract.csv'
 network_df.to_csv(filename, index=False, encoding='utf-8')
