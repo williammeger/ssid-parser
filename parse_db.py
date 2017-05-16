@@ -34,5 +34,10 @@ if network in names:
     # export csv with network and csids
     network_df = all_df.loc[all_df['network_code'] == network]
 
-filename = 'db_extract.csv'
-network_df.to_csv(filename, index=False, encoding='utf-8')
+for key in names:
+    filename = key + '.csv'
+    network_df = all_df.loc[all_df['network_code'] == key]
+    network_df.to_csv(filename, index=False, encoding='utf-8')
+
+# filename = '.csv'
+# network_df.to_csv(filename, index=False, encoding='utf-8')
